@@ -50,67 +50,69 @@ def uppercase_and_lowercase(paragraph: str):
 
 
 # Main Execution
-paragraph : str = st.text_area("Enter your paragraph here:",on_change=mark_para_entry)
+st.subheader("Original Paragraph")
+paragraph : str = st.text_area("Enter your paragraph here:",on_change=mark_para_entry,label_visibility="hidden")
 if paragraph != "":
-    st.write("Let's analyze!")
 
     # 1. Counts
     # Using type castings to convert counts into strings
-    st.subheader("Word and Character Count")
     n_words : int = count_word(paragraph)
     n_chars : int = count_char(paragraph)
+    n_vowels : int = count_vowel(paragraph)
 
     # Type castings
     n_words = str(n_words)
     n_chars = str(n_chars)
+    n_vowels = str(n_vowels) 
     st.write(f'''
-Words: {n_words}\n\n\
-Characters: {n_chars}
+Total Words: {n_words}\n\n\
+Total Characters: {n_chars}\n\n\
+Number of vowels: {n_vowels}
 ''')
 
-    st.subheader("Vowel Count")
-    n_vowels : int = count_vowel(paragraph)
-    n_vowels = str(n_vowels) 
-    st.write(f"Vowels: {n_vowels}")
-
-    # 2. Search and Replace
-    st.subheader("Search and Replace")
-    [col1,col2] = st.columns(2)
-    with col1:
-        st.text_input("Search:",key="search")
-    with col2:
-        st.text_input("Replace:",key="replace")
-
-    if st.session_state.search and st.session_state.replace:
-        st.write(f"Converted paragraph: {search_and_replace(paragraph)}")
-
-    # 3. Uppercase and lowercase
-    uppercase,lowercase = uppercase_and_lowercase(paragraph)
-    st.subheader("Uppercase")
-    st.write(uppercase)
-    st.subheader("Lowercase")
-    st.write(lowercase)
-
-    # 4. Python check and Average word length
+    # 2. Python check and Average word length
     words = paragraph.split()
     n_words = len(words)
     n_chars = 0
     check_once : bool = True
-    st.subheader("Python in Paragraph? (have at least one 'Python' in entire paragraph)")
     for word in words:
         # Python check
         if check_once and "Python" in word:
-            st.write("At least one instance of word 'Python' exists in the paragraph")
             check_once = False
     
-        # Average word length
+        # Average word length parameters
         word_chars = re.findall("[a-zA-Z0-9]",word)
         if word_chars:
             n_chars += len(word_chars)
 
-    st.subheader("Average word length (total characters **in words** divided by total words")
+    st.subheader("Does the paragraph contain the word 'Python'?")
+    st.write("Yes" if not check_once else "No")
+ 
+    # 2. Search and Replace
+    [col1,col2] = st.columns(2)
+    with col1:
+        st.subheader("Enter a word to search for:")
+        st.text_input("Search:",key="search",label_visibility="hidden")
+    with col2:
+        st.subheader("Enter a word to replace with:")
+        st.text_input("Replace:",key="replace",label_visibility="hidden")
+
+    if st.session_state.search and st.session_state.replace:
+        paragraph = search_and_replace(paragraph)
+        st.subheader("Modified Paragraph:")
+        st.write(paragraph)
+
+    # 3. Uppercase and lowercase
+    uppercase,lowercase = uppercase_and_lowercase(paragraph)
+    st.subheader("Paragraph in Uppercase")
+    st.write(uppercase)
+    st.subheader("Paragraph in Lowercase")
+    st.write(lowercase)
+
+
+    st.subheader("Average word length")
     if n_words:
-        st.write(f"Average word length: {round(n_chars/n_words,2)}")
+        st.write(f"{round(n_chars/n_words,2)}")
     
 else:
     if st.session_state.para_entered:
